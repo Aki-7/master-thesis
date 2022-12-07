@@ -1,0 +1,7 @@
+# Master Thesis
+
+Do this first.
+
+```sh
+platex cimt.ins
+```
