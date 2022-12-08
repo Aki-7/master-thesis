@@ -5,6 +5,14 @@
 
 \usepackage{layout}
 
+\usepackage[dvipdfmx]{hyperref}
+\usepackage{pxjahyper}
+
+\hypersetup{%
+  colorlinks=true,
+  linkcolor=black
+}
+
 \jtitle{タイトル}
 
 \etitle{Title}
@@ -37,7 +45,12 @@
 
 \mainmatter
 
-本文．
+\input src/intro.tex
+\input src/overview.tex
+\input src/rendering.tex
+\input src/2d.tex
+\input src/remote.tex
+\input src/conclusion.tex
 
 \backmatter
 
