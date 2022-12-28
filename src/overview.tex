@@ -76,7 +76,8 @@ MasterSynchronizerとそれぞれ機能を持ったモジュールからなる�
 とのコミュニケーションは共有メモリとセマフォを用いた独自のプロトコルで効率的に行っている．
 アプリケーションには2次元デスクトップ環境におけるウィンドウのメタファーとして
 3D Crystal（図\ref{fig:crystal-window}）と呼ばれる直方体領域が割り当てられており，
-このようなメタファーは後述するmotorcar\cite{reiling}でも用いられている．
+このようなメタファーは後述するmotorcar\cite{reiling}や
+studierstube\cite{studierstube}などでも用いられている．
 
 \begin{figure}[htbp]
   \centering
@@ -141,23 +142,23 @@ WaylandはLinuxで広く使われていたX Window Systemの，Linuxカーネル
 没入環境のマルチコンテキスト化を図る例は多い．
 2次元のPCの画面を没入空間で使えるようにするものとしては，
 Virtual Desktop
-\footnote{Virtual Desktop. Inc. "Virtual Desktop" https://www.vrdesktop.net/ (accessed 25 Dec, 2022)}
+\footnote{Virtual Desktop. Inc. ``Virtual Desktop'' https://www.vrdesktop.net/ (accessed 25 Dec, 2022)}
 のような専用のVRアプリケーションや，
 Meta Horizon Workrooms
-\footnote{Meta. "Meta Horizon Workrooms" https://www.meta.com/jp/work/workrooms/ (accessed 25 Dec, 2022)}
+\footnote{Meta. ``Meta Horizon Workrooms'' https://www.meta.com/jp/work/workrooms/ (accessed 25 Dec, 2022)}
 やSpatial
-\footnote{Spatial Systems, Inc. "Spatial" https://www.spatial.io/ (accessed 25 Dec, 2022)}
+\footnote{Spatial Systems, Inc. ``Spatial'' https://www.spatial.io/ (accessed 25 Dec, 2022)}
 といった会議やイベント用のVRアプリケーションの中でPC画面を投影するものなどがある．
 また，Microsoftの提供するMixed Reality HMDであるHoloLens
-\footnote{Microsoft "HoloLens" https://www.microsoft.com/ja-jp/hololens (accessed 25 Dec, 2022)}
+\footnote{Microsoft ``HoloLens'' https://www.microsoft.com/ja-jp/hololens (accessed 25 Dec, 2022)}
 や Meta社の提供するMeta Quest
-\footnote{Meta "Meta Quest" https://www.meta.com/jp/quest/ (accessed 25 Dec, 2022)}
+\footnote{Meta ``Meta Quest'' https://www.meta.com/jp/quest/ (accessed 25 Dec, 2022)}
 では特定の形式の2Dアプリケーションを没入環境で複数起動できる仕組みがある．
 ただし，これらは没入環境自体をマルチコンテキスト化しているわけではなく，
 没入環境にマルチコンテキストな2Dデスクトップ環境を持ち込んでいると捉えられる．
 
 さらに，VRやARのシステムの標準化におけるデファクトスタンダードであるOpenXR
-\footnote{Khronos group "OpenXR" https://www.khronos.org/openxr/ (accessed 25 Dec, 2022)}
+\footnote{Khronos group ``OpenXR'' https://www.khronos.org/openxr/ (accessed 25 Dec, 2022)}
 では．Overlayと呼ばれる機能が定義されており，メインのユーザの視野全体を支配する
 アプリケーションに重ねて，他のコンテンツを表示できる仕組みを提供しており，
 VRゲームをプレイしながら，ソーシャルメディアを時々チェックするといった，
@@ -167,7 +168,64 @@ VRゲームをプレイしながら，ソーシャルメディアを時々チェ
 \label{section:overview:conclusion}
 
 本論文での結論としては，Waylandのプロトコル拡張の機能を用いる Reiling の手法を基本的な
-システム構成のベースとした．
+システム構成のベースとした（図\ref{fig:overview}）．
+システムの構成要素は，3DアプリケーションとWayland上で動作する既存の2Dアプリケーション，
+入力装置であるキーボードとマウス，没入環境を提示するHMD，そしてそれらとコミュニケーションを
+とって制御する3Dコンポジッタである．
+3Dコンポジッタはマウスやキーボードの入力を適切にアプリケーションに分配し，
+2D/3Dアプリケーションは没入環境に描画したい内容を3Dコンポジッタに伝える．
+3Dコンポジッタは複数のアプリケーションから受け取った情報を合成してHMDに表示することで，
+ユーザに複数アプリケーションが利用可能な没入環境を提示できる．
+
+% TODO: 入力に関してはFuture workであることをここで述べるのもあり．
+
+本論文が扱うのは3Dアプリケーションとコンポジッタとの間のやり取りのプロトコル，
+また3Dコンポジッタの設計・実装の部分である．
+2Dアプリケーションとコンポジッタとの間のプロトコルは既存のものが存在しており，
+本論文のスコープの範囲ではないが，他の部分の設計において重要な要素であり，
+詳しくは\ref{chapter:2d}章で扱う．
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[keepaspectratio, width=\linewidth]{figures/overview.png}
+  \caption{提案するシステムの概要図．}
+  \label{fig:overview}
+\end{figure}
+
+類似研究・技術と比較してこの設計を選択した理由は以下の通りである．
+\begin{itemize}
+  \item マルチコンテキストな没入環境を社会実装していくうえで大きな課題となるのは，
+        初期の3Dアプリケーションの少なさである．
+        ユーザの視野全体を覆うというパラダイムのアプリケーションから，空間の一部を占有する
+        アプリケーションへと変えようとしているため，既存の3Dアプリケーションを少し改変して
+        対応できるわけではない．
+        しかし豊富に存在する既存の2Dアプリケーションが，没入環境で使うことができれば，
+        3Dアプリケーションは，例えば3Dモデルをみるだけといった，補助的な役割から
+        始めることができる．
+        このため既存の2Dアプリケーションを利用できるようにすることは大変重要であると考える．
+        CRYSTALやStudierstube，OpenXRのOverlayなどは2Dアプリケーションを表示する
+        仕組みとは全く異なる仕組みを用いているため，既存の2Dアプリケーションを
+        利用することは不可能，または制限がかかることになる．
+        一方，本論文が採用したシステムでは，2Dアプリケーションと直接やり取りするコンポジッタを
+        自由に設計し直せるため，没入環境で2Dアプリケーションを最大限利用できる．
+        その詳細は\ref{chapter:2d}章で述べる．
+
+  \item 本システムは単一ホストマシンでの利用のみをスコープとしており，Studierstubeのような
+        複数のホストマシンでの多人数の利用に関してはスコープに入れていない．
+        どのように多人数でのコラボレーションを実現するかは，自明でないためである．
+        例えば，ユーザの間で同期されるべきデータについても，3Dモデルを共同編集するような
+        アプリケーションであれば，メッシュやテクスチャのデータを同期しなければいけないが，
+        同時にある動画を見るアプリケーションであれば，同期するべきデータは動画のIDと再生時間
+        のみで良い可能性がある．その他にも同期の頻度やタイミング，操作や閲覧の
+        権限管理をするかなどは個別のアプリケーションによって替わりうる．
+        また，サーバなどインフラやその他の機器を必要とする場合もありえる．
+        このため個別の3Dアプリケーションがサーバなどを介して，
+        サービスとして多人数コラボレーションを実現するのが現実的だと考えられる．
+
+  \item \ref{section:background}で述べたように，没入環境を用いた3Dアプリケーションは
+        様々な分野で応用されており，単に没入環境にPCの画面を投影するだけでは
+        没入環境を最大限利用できていない．
+\end{itemize}
 
 % Windowing Systemを利用すること。
 % マルチコンピュータでの相互互助などはそれぞれのClient Applicationに任せる方針を取る。

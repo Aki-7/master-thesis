@@ -1,0 +1,20 @@
+== Abstract
+
+=== Title
+
+マルチコンテキスト没入環境のためのWindowing Systemの実現に関する研究
+
+The design and implementation of a windowing system for multi-context immersive environments.
+
+=== Abstract (170文字)
+
+VRなどの没入環境のおける現状のパラダイムでは，1つのアプリケーションがユーザの視野全体を支配し，
+空間全体が会議や手術シミュレーションといった特定のコンテキストのために設計される．
+本研究では様々なコンテキストに動的に対応できる没入環境を実現するため，
+没入環境のためのWindowing Systemを設計，評価し，その有用性を示した．
+
+=== 研究発表
+
+国際会議1件
+ACM SIGGRAPH 2022 Posters. https://doi.org/10.1145/3532719.3543200
+
