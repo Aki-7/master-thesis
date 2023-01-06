@@ -349,8 +349,46 @@ GPUのコンテキストスイッチが少なく，効率的である．
 そのため質の悪いアプリケーションがフリーズしたり，動作が遅くなった場合でも，アプリケーションの
 配置を決めるModel Matrixが更新可能である必要がある．
 
-% 以上の議論から，レンダリングする際にModel MatrixとView Projection Matrixをいかに適応させる
-% かが重要である．通常の没入環境のアプリケーションであれば，
+以上の議論から，レンダリングする際にModel Matrixと視点の情報である
+View Projection Matrixをいかに適応させるかが重要である．
+\ref{section:3DCG}で述べたように，Model MatrixやView Projection Matrix は
+Uniform変数として用い，シェーダで頂点に対して適用することが多い．
+一般的な既存のVRアプリケーション（図\ref{fig:app-mvp}）では
+ソースコード\ref{code:vertex-shader}のようなVertex Shaderと，そのVertex Shaderで
+用いられているModel MatrixやView Projection Matrixを示すUniform変数に入れる値を
+Graphics Pipelineに伝えることで，頂点にModel MatrixとView Projection matrix
+を適用させている．
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[keepaspectratio, width=1\linewidth]{figures/app-mvp.png}
+  \caption{．
+    没入環境での一般的なアプリケーションでのMode View Projection Matrixの適応のさせ方の例．
+  }
+  \label{fig:app-mvp}
+\end{figure}
+
+本システムのレンダリングシステムでは（図\ref{fig:rendering}），Model Matrixは
+コンポジッタがアプリケーションごとに管理しているものを，View Projection Matrixは
+HMDから取得したものをアプリケーションへ渡すことなくGraphics Pipeline実行時に適用する．
+そのため本システムではシェーダで用いるUniform変数のいくつかを予約しており，
+例えば``zModel''という名前のUniform変数にはModel Matrixの値を，
+``zViewProjection''というUniform変数にはView Projection Matrixの値をコンポジッタ側で
+設定することとしている．
+アプリケーションはソースコード\ref{code:zigen-vertex-shader}のようなVertex Shaderを
+記述することで，Model MatrixやView Projection Matrixの実際の値を知らないまま，
+用いることができる．
+
+\begin{lstlisting}[caption=本システムでのVertex Shaderの例, label=code:zigen-vertex-shader]
+  uniform mat4 zModel;
+  uniform mat4 zViewProjection;
+  layout(location = 0) in vec4 position;
+  
+  void main() {
+    gl_Position = zViewProjection * zModel * position;
+  }
+\end{lstlisting}
+
 
 % アプリケーションの質が悪く，フリーズしたり，動作が遅い場合に本システムでは
 % アプリケーションがフリーズした場合や動作が遅い場合でも，視点の移動をレンダリングに反映させ
