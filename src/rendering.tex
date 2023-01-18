@@ -260,7 +260,7 @@ Peuhkurinenらの手法の特徴は以下のとおりである．
   \fbox{
     \includegraphics[keepaspectratio, width=0.9\linewidth]{figures/peuhkurinen-rendering.png}
   }
-  \caption{．
+  \caption{
     Peuhkurinenら\cite{peuhkurinen}の提案するシステムのレンダリング手法の概略図．
   }
   \label{fig:peuhkurinen-rendering}
@@ -315,7 +315,7 @@ Rendering Resourceは複数のRendering Unitに対して紐づけることが可
 \begin{figure}[htbp]
   \centering
   \includegraphics[keepaspectratio, width=1\linewidth]{figures/rendering.png}
-  \caption{．
+  \caption{
     本システムのレンダリング手法の概要図．
   }
   \label{fig:rendering}
@@ -354,8 +354,8 @@ GPU上のメモリに転送できるため，転送や再形成のためにオ�
 配置を決めるModel Matrixが更新可能である必要がある．
 
 以上の議論から，レンダリングする際にModel Matrixと視点の情報である
-View Projection Matrixをいかに適応させるかが重要である．
-\ref{section:3DCG}で述べたように，Model MatrixやView Projection Matrix は
+View Projection Matrixをいかに適用するかが重要である．
+\ref{section:3DCG}で述べたように，通常Model MatrixやView Projection Matrix は
 Uniform変数として用い，シェーダで頂点に対して適用することが多い．
 一般的な既存のVRアプリケーション（図\ref{fig:app-mvp}）では
 ソースコード\ref{code:vertex-shader}のようなVertex Shaderと，そのVertex Shaderで
@@ -366,7 +366,7 @@ Graphics Pipelineに伝えることで，頂点にModel MatrixとView Projection
 \begin{figure}[htbp]
   \centering
   \includegraphics[keepaspectratio, width=1\linewidth]{figures/app-mvp.png}
-  \caption{．
+  \caption{
     没入環境での一般的なアプリケーションでのMode View Projection Matrixの適応のさせ方の例．
   }
   \label{fig:app-mvp}
@@ -393,7 +393,11 @@ HMDから取得したものをアプリケーションへ渡すことなくGraph
   }
 \end{lstlisting}
 
-
+このように本システムでは，Model MatrixとView Projection Matrixを表すUniform変数の値を
+コンポジッタ側が，それ以外のレンダリングパイプラインの実行に必要なオブジェクトやパラメータを
+アプリケーション側が提供し，コンポジッタ側でレンダリングパイプラインを実行する．
+これにより，レンダリングに関するオーバヘッドが小さく，レンダリングの自由度を高く保ち，
+かつ質の悪いアプリケーションに対して堅牢なレンダリングシステムを実現した．
 % アプリケーションの質が悪く，フリーズしたり，動作が遅い場合に本システムでは
 % アプリケーションがフリーズした場合や動作が遅い場合でも，視点の移動をレンダリングに反映させ
 % 続けるためには，視点情報をアプリケーションに送らないことが重要である．
@@ -401,7 +405,112 @@ HMDから取得したものをアプリケーションへ渡すことなくGraph
 
 % 視点情報を送らない
 
-\section{評価}
+\section{評価：レンダリング性能}
+
+本節では，レンダリング性能に関して絶対的な評価をした．
+
+\subsection{実装・環境}
+
+プログラミング言語はCとC++を用いた．
+アプリケーションとコンポジッタ間のIPCにはWaylandを用いた．
+HMDへの出力，HMDからのView Projection Matrixの取得にはSteamVRランタイムのOpenVRを用いた．
+その他の環境に関しては表\ref{table:rendering-env}に示す．
+
+\begin{table}[htbp]
+  \centering
+  \begin{tabular}{|r||l|}
+    \hline
+    OS     & Ubuntu 20.04.4 LTS                        \\
+    \hline
+    Kernel & 5.13.0-41-generic                         \\
+    \hline
+    CPU    & Intel(R) Core(TM) i7-10700K CPU @ 3.80GHz \\
+    \hline
+    GPU    & GeForce RTX 2070 SUPER                    \\
+    \hline
+    Memory & 32GB                                      \\
+    \hline
+    HMD    & Valve Index                               \\
+    \hline
+  \end{tabular}
+  \caption{レンダリングに関する実験環境}
+  \label{table:rendering-env}
+\end{table}
+
+また，今回の実装ではFPSの上限は90fpsとなっている．
+
+\subsection{実験の設定}
+
+本実験ではレンダリングの性能を確かめるため，いくつかのタイプの3Dアプリケーションを複数実行し，
+システム全体のFPSの変化を測定した．
+実験に用いたアプリケーションは以下の3つである．
+
+\subsubsection*{Box App}
+
+Box App（図\ref{fig:box-app}）は立方体を表示する，頂点の少ない簡単なアプリケーションである．
+ただし一面にテクスチャが貼られており，アプリケーションは毎フレームテクチャを更新する．
+テクスチャのサイズは256x256で1ピクセルあたりビット数は32bitである．
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[keepaspectratio, width=0.6\linewidth]{figures/box-app.png}
+  \caption{
+    Box App．頂点が少なく，テクスチャの更新がある．
+  }
+  \label{fig:box-app}
+\end{figure}
+
+\subsubsection*{STL App}
+
+STL App（図\ref{fig:stl-app}）は
+STL\footnote{Wikipedia. ``STL(file format)'' \url{https://en.wikipedia.org/wiki/STL_(file_format)} (accessed 17 Jan, 2022)}
+形式のファイルを表示するアプリケーションである．
+比較的頂点数が多いが，データの更新がない．
+本実験で用いたSTLファイルは頂点数が324,000個のものである．
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[keepaspectratio, width=0.6\linewidth]{figures/dragon-app.png}
+  \caption{
+    STL App．頂点が多いが，データの更新がない．
+  }
+  \label{fig:stl-app}
+\end{figure}
+
+\subsubsection*{STL App with rotation}
+
+STL App with rotationはSTL Appに加え，STL オブジェクトをヨー方向に回転させる．
+アプリケーションは回転量を表すUniform変数（float, 32bit）を毎フレーム更新し，
+頂点シェーダで頂点の回転処理を記述している．
+
+\subsection{結果}
+
+上記の三種類のアプリケーションそれぞれについて，同時に起動するアプリケーションの数を
+増やしたときのFPSの変化を図\ref{fig:rendering-fps}に示す．
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[keepaspectratio, width=\linewidth]{figures/rendering-fps.png}
+  \caption{
+    レンダリング性能測定実験の結果．
+  }
+  \label{fig:rendering-fps}
+\end{figure}
+
+いずれのタイプのアプリケーションでも40個ほどまでは90fps近くを保っており，
+本レンダリング手法が十分実用に耐えうることが示された．
+また，STL App や STL App with rotationのように，頂点データ数が多くても
+時間あたりに更新するデータが少ないアプリケーションであれば，さらに多くのアプリケーションを
+レンダリングできることがわかった．
+
+STL AppとSTL App with rotationにおいて，アプリケーション数が90個近くなったときに
+急激にFPSが落ち込むのは，頂点数が多く，レンダリングパイプラインの処理が1フレーム内に
+収まりきらなくなり，バッファのスワップが次のフレームタイミングで行われるようになったためである．
+一方Box Appでは比較的連続的にFPSが落ちるが，これはコンポジッタ側でアプリケーションから
+共有されたテクスチャをGPUへ送る部分に時間がかかっており，コンポジッタのメインループが
+ビジー状態になっていることが原因である．
+
+\section{評価：レンダリングの自由度}
 
 % 実験内容
 % * レンダリング性能
