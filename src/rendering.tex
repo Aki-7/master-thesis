@@ -512,6 +512,97 @@ STL AppとSTL App with rotationにおいて，アプリケーション数が90�
 
 \section{評価：レンダリングの自由度}
 
+この章では様々なレンダリング手法が本レンダリングシステムで適応できることを示し，
+レンダリングの自由度が高いことを示す．
+
+\subsection{フラグメントシェーダでのRay Marchingを用いたメタボール}
+
+Ray Marchingはメッシュを用いずにRayを走査することでレンダリングを行う技法の1つであり，
+数学的な幾何構造の可視化\cite{ray-marching-math}に用いられたり，
+より高度なレンダリング手法\cite{ray-marching-advanced1}\cite{ray-marching-advanced2}
+の基礎として用いられる．
+
+メタボール\cite{meta-ball}とはメタボールどうしが近づくことで，
+一定の規則に沿ってそれらのメタボールが融合し，ひとかたまりとなる球状のオブジェクトである．
+
+ここではフラグメントシェーダ内でのRay Marchingの一種である
+Sphere Tracing\cite{sphere-tracing}を実装し，本システムで
+メタボールを表現可能であることを確認した（図\ref{fig:meta-ball}）．
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[keepaspectratio, width=0.7\linewidth]{figures/meta-ball.png}
+  \caption{
+    本レンダリングシステムでSphere Tracingを用いてメタボールをレンダリングする様子．
+  }
+  \label{fig:meta-ball}
+\end{figure}
+
+\subsection{Geometry Shaderを用いた頂点の追加と変換}
+
+\ref{section:3DCG}では主なシェーダとしてVertex ShaderとFragment Shaderを説明したが，
+OpenGLではその他にもGeometry ShaderやTesselation Shaderなどがあり，
+これらはレンダリングの効率化\cite{geometry-shader-research1}や，
+より高度な表現\cite{geometry-shader-research2}のために用いられることがある．
+
+
+本システムではOpenGLのAPIを踏襲しているため，これらのシェーダを利用してレンダリングを
+行うこともできる．
+ここでは本レンダリングシステムでGeometry Shaderを用いて，メッシュにポリゴンを追加したり，
+頂点を編集したりできることを確かめた（図\ref{fig:geometry-shader}）．
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[keepaspectratio, width=0.7\linewidth]{figures/geometry-shader.jpg}
+  \caption{
+    図右の月のオブジェクトに対して，Geometry Shaderを適応し，
+    球体内部のポリゴンの追加と，頂点の編集を行い，図左のオブジェクトをレンダリングする様子．
+  }
+  \label{fig:geometry-shader}
+\end{figure}
+
+\subsection{カラーマップ以外のテクスチャの利用}
+
+テクスチャマッピングは，メッシュ表面のベースカラーを表現する以外にも多くの利用方法がある．
+バンプマップ\cite{bump-mapping}ではテクスチャにメッシュの表面からの高さの変位を
+エンコーディングし，面の法線ベクトルの微妙な変化を計算して，シェーディングに利用することで
+細やかな表面の表現が可能になる．
+また，テクスチャにメッシュ表面の法線ベクトルをエンコーディングした法線マップを用いた
+レンダリング手法\cite{normal-map}や，
+テクスチャにメッシュ表面の光沢の度合いをエンコーディングするスペキュラマップなどは
+一般によく用いられる．
+
+本システムではテクスチャの利用の仕方も特定の方法に限定しないため，これらのようなテクスチャの
+利用方法も実現できる．
+ここでは本レンダリングシステムでバンプマップを用ることで，月面の細やかな法線の揺らぎを
+計算し，月面の凹凸による陰を表現できることを確認した．
+
+\begin{figure}[htbp]
+  \begin{minipage}[t]{\linewidth}
+    \centering
+    \includegraphics[keepaspectratio, width=0.49\linewidth]{figures/no-bump-map.jpg}
+  \end{minipage}
+  \begin{minipage}[t]{0.49\linewidth}
+    \captionsetup[sub]{margin=0.1cm}
+    \centering
+    \includegraphics[keepaspectratio, width=\linewidth]{figures/bump-map0.jpg}
+  \end{minipage}
+  \begin{minipage}[t]{0.49\linewidth}
+    \captionsetup[sub]{margin=0.1cm}
+    \centering
+    \includegraphics[keepaspectratio, width=\linewidth]{figures/bump-map1.jpg}
+  \end{minipage}
+  \caption{
+    本レンダリングシステムでバンプマップを適用し，月面の凹凸をレンダリングに反映させた様子．
+    図上はバンプマップを適用しない場合．
+    図下の左右はバンプマップを適用し，光源の位置を変化させた様子．
+  }
+  \label{fig:bumpmap}
+\end{figure}
+
+
+% Sphere Tracing はRay Marching手法の1つで，
+
 % 実験内容
 % * レンダリング性能
 % * 自由度
@@ -520,7 +611,13 @@ STL AppとSTL App with rotationにおいて，アプリケーション数が90�
 % * 他のApplicationの影
 % * シングルパスステレオレンダリング
 
-\section{結論}
+\section{まとめ}
+
+% \subsection{まとめ}
+
+% \subsection{限界}
+
+% \subsection{今後の課題}
 
 % * 今後の展開
 % ** PBR ベースなど
