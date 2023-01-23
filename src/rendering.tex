@@ -284,7 +284,7 @@ motorcarの手法では，レンダリングの自由度は高いが，レンダ
 レンダリングパイプラインをそのまま使うことができるようにすることである．
 そこで本システムでは広く使われているグラフィックスライブラリであるOpenGLをベースとした
 レンダリングプロトコルを作成した．今回は特にOpenGL ES 3.2
-\footnote{Khronos Group "OpenGL ES Version 3.2" \url{https://registry.khronos.org/OpenGL/specs/es/3.2/es_spec_3.2.pdf} (accessed 29, Dec)}
+\footnote{Khronos Group "OpenGL ES Version 3.2" \url{https://registry.khronos.org/OpenGL/specs/es/3.2/es_spec_3.2.pdf} (accessed 29 Dec, 2022)}
 をもとにしている．
 
 OpenGLでは以下のようなオブジェクトが定義されており（一部）．
@@ -613,11 +613,26 @@ OpenGLではその他にもGeometry ShaderやTesselation Shaderなどがあり�
 
 \section{まとめ}
 
-% \subsection{まとめ}
+%まとめ
+%限界
+%今後の課題
 
-% \subsection{限界}
+本システムでは没入環境でのウィンドウシステムにおいて，複数のアプリケーションが別々に
+提示してきたレンダリングの情報を合成して1つの没入環境に矛盾なくレンダリングする方法を検討した．
+OpenGLで定義されているオブジェクトと，一度のレンダリングパイプラインの実行に相当する
+Rendering Unitをプロトコルとして定義することで，効率的かつ，自由度の高いレンダリングを可能にした．
+また，HMDなどから取得されるModel View Projection MatrixはUniform変数として
+コンポジッタ側でレンダリングパイプラインに渡すことで，質の悪いアプリケーションに対しても
+ロバストなシステムとなった．
 
-% \subsection{今後の課題}
+本レンダリングシステムの限界としてはRendering Unitが一度のレンダリングパイプラインの実行に
+相当しており，マルチパスなレンダリング手法に対応できていないことが挙げられる．
+これを実現するには，Rendering Unitの出力を他のRendering Unitの入力に用いるといった
+レンダリングプロトコルの拡張を考える必要があるが，これは今後の課題としたい．
+また，頂点のデータ構造などもそれぞれのアプリケーションで定義することになるため，
+他のアプリケーションの影を落とすといった，アプリケーションどうしのレンダリングの影響の及ぼし合い
+は困難である．影を落とすという点では，メッシュの形状などを別途のプロトコルで定義したり，
+Physically Based Rendering\cite{physically-based-rendering}に即している
+glTF2.0\footnote{The Khronos 3D Format Working Group. ``glTF 2.0 Specification'' \url{https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html} (accessed 23 Jan, 2023)}
+を踏襲したレンダリングプロトコルを定義するといったことが考えられるが，これも今後の研究課題としたい．
 
-% * 今後の展開
-% ** PBR ベースなど
