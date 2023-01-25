@@ -177,7 +177,7 @@ VRゲームをプレイしながら，ソーシャルメディアを時々チェ
 3Dコンポジッタはマウスやキーボードの入力を適切にアプリケーションに分配し，
 2D/3Dアプリケーションは没入環境に描画したい内容を3Dコンポジッタに伝える．
 3Dコンポジッタは複数のアプリケーションから受け取った情報を合成してHMDに表示することで，
-ユーザに複数アプリケーションが利用可能な没入環境を提示できる．
+ユーザに複数アプリケーションが利用可能な没入環境を提示できる（図\ref{fig:system-view}）．
 
 % TODO: 入力に関してはFuture workであることをここで述べるのもあり．
 
@@ -192,6 +192,19 @@ VRゲームをプレイしながら，ソーシャルメディアを時々チェ
   \includegraphics[keepaspectratio, width=\linewidth]{figures/overview.png}
   \caption{提案するシステムの概要図．}
   \label{fig:overview}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[keepaspectratio, width=\linewidth]{figures/system-view.png}
+  \caption{
+    提案するシステムが実現した没入環境．
+    天体を表示するアプリケーション（左上），ブラウザ（右），
+    3Dモデルを表示するアプリケーション（右，ブラウザと重なっている），
+    ターミナル（左下）がそれぞれ別のアプリケーションとして立ち上がり，
+    1つの没入環境を作り上げている．
+  }
+  \label{fig:system-view}
 \end{figure}
 
 類似研究・技術と比較してこの設計を選択した理由は以下の通りである．

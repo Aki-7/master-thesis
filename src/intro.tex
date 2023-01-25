@@ -32,7 +32,7 @@ VRChat\footnote{VRChant Inc. ``VRChat'' \url{https://hello.vrchat.com/} (accesse
 % 引用する。ref: https://www.sciencedirect.com/science/article/pii/S0747563221004489?casa_token=jobxsigkGQgAAAAA:ZlsQ9qSco-m6yyW-6DJVsP1eifqtqyISE8K_NyA9uzLyYr51nbUa7bbQxzWO0Bh1V6kUEftt5yhh
 % 言いたいことをまとめる。 多様化が進んでいて、色々なコンテキストでの利用がある。
 
-\section{問題点}
+\section{課題}
 \label{section:intro:problem}
 
 これから現在の没入環境のパラダイムの問題点を考える前に，これと比較するため2次元の
@@ -44,7 +44,8 @@ VRChat\footnote{VRChant Inc. ``VRChat'' \url{https://hello.vrchat.com/} (accesse
 アプリケーションの起動や停止も随時可能であるため，ユーザは自分に必要なアプリケーションを
 ダウンロードしたり，開発したりしておき，時々のコンテキストに合わせて必要なアプリケーションを
 起動して，不要なアプリケーションを停止するということを行っている．
-これによって1つのスクリーン空間を柔軟に変化させ，様々なコンテキストに適応させて用いている（図\ref{fig:context-switch}）．
+これによって1つのスクリーン空間を柔軟に変化させ，
+様々なコンテキストに適応させて用いていることができている（図\ref{fig:context-switch}）．
 
 \begin{figure}[htbp]
   \centering
@@ -71,33 +72,36 @@ VRChat\footnote{VRChant Inc. ``VRChat'' \url{https://hello.vrchat.com/} (accesse
 没入環境が今後ユーザの普段の生活に溶け込み，継続的に生活や仕事をサポートするようになるためには，
 ユーザの連続的に変化し続けるコンテキストに柔軟に対応可能な，新しいパラダイムが必要である．
 
+このようなマルチコンテキストな没入環境を実現するための既存研究はいくつか存在し，
+後の章で取り上げるが，いずれも実験的なものであり，実用的な実装を伴うものはなく，
+十分なレンダリングの性能を達成したり，質の悪いアプリケーションが存在する場合の議論が
+行われていたりするものはなかった．
+本研究を進めるにあたっては，実際に利用可能なXR向けのWindowing Systemである``Zwin''
+\footnote{Zwin Project. ``Zwin'' \url{https://zwin.dev} (accessed 25 Jan, 2023)}
+の開発を同時に行い，OSSプロジェクトとして社会実装も進めてきた．
+本論文は``Zwin''の開発における基礎研究のうち，
+私の修士課程の研究成果として携わった部分に関してまとめている．
+
 \begin{figure}[htbp]
-  \begin{minipage}[t]{0.55\linewidth}
-    \captionsetup[sub]{margin=0.1cm}
-    \centering
-    \includegraphics[keepaspectratio, height=1.3in]{figures/google-earth.png}
-    \subcaption*{Google Earth VR\footnotemark}
-  \end{minipage}
-  \begin{minipage}[t]{0.43\linewidth}
-    \captionsetup[sub]{margin=0.1cm}
-    \centering
-    \includegraphics[keepaspectratio, height=1.3in]{figures/vrc.png}
-    \subcaption*{VRChat\footnotemark}
-  \end{minipage}
-  \caption{
+  \centering
+  \fbox{
+    \includegraphics[keepaspectratio, width=0.9\linewidth]{figures/switch-app.png}
+  }
+  \caption[]{
     没入環境でコンテキストを切り替える例．地図を見るというコンテキストから
-    大人数でゲームをするというコンテキストへの変化を考える．この時ユーザは左図のような
+    大人数でゲームをするというコンテキストへの変化を考える．この時ユーザは図左下のような
     空間全体を支配した地図アプリケーションの中におり，このアプリケーションを停止し，
-    一度ホームの空間に戻る．そこから次は右図のようなソーシャルアプリケーションを起動し，
+    一度ホームの空間に戻る．そこから次は図右下のようなソーシャルアプリケーションを起動し，
     そのアプリケーションの世界に入るという流れになる．
     このように現在の没入環境ではシングルコンテキストな3D空間の間を，
     非連続的に切り替えることしかできない．
+    （図左下は``Google Earth\footnotemark[4]''，図右下は``VRChat\footnotemark[5]''）
   }
   \label{fig:switching-app}
 \end{figure}
 
-\footnotetext[3]{Adapted from Google. ``Google Earth VR'' \url{https://arvr.google.com/earth/} (accessed on 19 Dec, 2022)}
-\footnotetext[4]{Adapted from VRChat Inc. ``PRESS KIT - VRChat'' \url{https://hello.vrchat.com/press} (accessed on 19 Dec, 2022)}
+\footnotetext[4]{Adapted from Google. ``Google Earth VR'' \url{https://arvr.google.com/earth/} (accessed on 19 Dec, 2022)}
+\footnotetext[5]{Adapted from VRChat Inc. ``PRESS KIT - VRChat'' \url{https://hello.vrchat.com/press} (accessed on 19 Dec, 2022)}
 
 % ユーザの視野全体を占めている。
 % シングルコンテキスト
