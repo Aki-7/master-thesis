@@ -7,19 +7,22 @@
 Virtual Reality (VR) や Augmented Reality (AR) などの没入環境の社会実装は昨今急速に
 進んでおり，比較的安価なコンシューマ向けのHead Mounted Display (HMD) の登場により，
 多くの人が没入環境を体験，利用できるようになった．
-没入空間の利用シーンは年々多様化しており，コンシューマ向けのVR/ARマーケットではゲームなど
-エンターテイメント向けの利用が目立つが，VRChat\footnote{https://hello.vrchat.com/}や
-Horizon World\footnote{https://www.oculus.com/horizon-worlds/}といった
-コミュニティに重きを置いた利用も活発になり，コンピュータネットワーク上の新たな世界を指す
-メタバースという言葉が流行っている．また没入空間の職業支援や，職業訓練への適用として，
-手術\cite{Gallagher2005-gv}や航空宇宙\cite{aerospace}，軍事\cite{military}，
-農業\cite{agriculture}などさまざまな分野での研究が活発であり，
-産業界での実際の導入も進んでいることがIDCのレポート\cite{idc-2022}からもわかる．
+没入環境の利用シーンは年々多様化しており，コンシューマ向けのVR/ARマーケットではゲームなど
+エンターテイメント向けの利用が目立つが，
+VRChat\footnote{VRChant Inc. ``VRChat'' \url{https://hello.vrchat.com/} (accessed on 24 Jan, 2023)}
+やHorizon World\footnote{Facebook Technologies, LLC. ``Horizon Worlds'' \url{https://www.oculus.com/horizon-worlds/} (accessed on 24 Jan, 2023)}
+といったコミュニティに重きを置いた利用も活発になり，コンピュータネットワーク上の新たな世界を指す
+メタバースという言葉が流行っている．
+また没入環境の職業支援や，職業訓練への応用も進んでおり，
+医療\cite{Gallagher2005-gv}や航空宇宙\cite{aerospace}，軍事\cite{military}，
+農業\cite{agriculture}などさまざまな分野での研究が活発で，
+実際に産業界での導入も進んでいることがIDCのレポート\cite{idc-2022}からわかる．
 
 ここで述べておきたいことは，昨今の没入環境の利用シーンは多様化しており，
-様々なコンテキストにおいて没入空間の利用が期待されているという点である．
-ここでのコンテキストとは，利用者がどのような目的を持ってどのような作業をしようとしているかを指し，
-それは利用時の状況（休日で趣味に時間を使いたいのか，平日で仕事をしたいのかなど）や利用者の職業
+様々なコンテキストにおいて没入環境の利用が期待されているという点である．
+ここでのコンテキストとは，没入環境の内外に関わらず，
+ユーザがどのような目的を持ってどのような作業をしようとしているかを指し，
+それは利用時の状況（休日で趣味に時間を使いたいのか，平日で仕事をしたいのかなど）やユーザの職業
 などの複雑な組み合わせのもとに生起され，個人ごとの差異があり，個人のなかでもその時々ごとに
 連続的に変わってゆくものであるとする．ここで連続的と表現しているのは，ユーザがもつコンテキストは
 料理をする，勉強をする，などと離散的に切り替わってゆくものではなく，料理をしながら動画を見る，
@@ -50,7 +53,7 @@ Horizon World\footnote{https://www.oculus.com/horizon-worlds/}といった
   }
   \caption{
     2次元のデスクトップ環境のユーザがコンテキストを変化させてゆく例．
-    3Dモデルの制作者を例に，コンテキストを上段の左から右のように変化していくとき，
+    3Dモデルの制作者を例に，コンテキストが上段の左から右のように変化していくとき，
     3Dモデル制作者は下段のようにそのコンテキストの変化に対応して，アプリケーションを閉じたり，
     新しく開いたりすることでスクリーン空間を柔軟に適応させることができる．
   }
@@ -60,10 +63,10 @@ Horizon World\footnote{https://www.oculus.com/horizon-worlds/}といった
 以上の点から2次元のデスクトップ環境でのスクリーン空間は不特定のコンテキストに対応可能な，
 マルチコンテキストな空間であるといえる．
 
-比較して現在の没入空間のパラダイムでは，基本的に1つのアプリケーションがユーザの視野全体を支配している．
+比較して現在の没入環境のパラダイムでは，基本的に1つのアプリケーションがユーザの視野全体を支配している．
 そのためユーザがコンテキストを切り替えるときは，アプリケーションを別のものに切り替え，
 全く異なる世界に移動するような形となる（図\ref{fig:switching-app}）．
-このため，没入環境での3D空間は特定にアプリケーションによって，会議をするといった特定の
+このため，没入環境での3D空間はその空間を支配する1つのアプリケーションによって，会議をするといった特定の
 コンテキストのために設計されているシングルコンテキストな空間となっている．
 没入環境が今後ユーザの普段の生活に溶け込み，継続的に生活や仕事をサポートするようになるためには，
 ユーザの連続的に変化し続けるコンテキストに柔軟に対応可能な，新しいパラダイムが必要である．
@@ -73,23 +76,28 @@ Horizon World\footnote{https://www.oculus.com/horizon-worlds/}といった
     \captionsetup[sub]{margin=0.1cm}
     \centering
     \includegraphics[keepaspectratio, height=1.3in]{figures/google-earth.png}
-    \subcaption*{Google.「Google Earth VR」\url{https://arvr.google.com/earth/} （accessed Dec 19, 2022）.}
+    \subcaption*{Google Earth VR\footnotemark}
   \end{minipage}
   \begin{minipage}[t]{0.43\linewidth}
     \captionsetup[sub]{margin=0.1cm}
     \centering
     \includegraphics[keepaspectratio, height=1.3in]{figures/vrc.png}
-    \subcaption*{VRChat Inc.「PRESS KIT - VRChat」\url{https://hello.vrchat.com/press} （accessed Dec 19, 2022）.}
+    \subcaption*{VRChat\footnotemark}
   \end{minipage}
   \caption{
     没入環境でコンテキストを切り替える例．地図を見るというコンテキストから
-    大人数でゲームをするというコンテキストへの切り替えを考える．この時ユーザは左図のような
+    大人数でゲームをするというコンテキストへの変化を考える．この時ユーザは左図のような
     空間全体を支配した地図アプリケーションの中におり，このアプリケーションを停止し，
     一度ホームの空間に戻る．そこから次は右図のようなソーシャルアプリケーションを起動し，
     そのアプリケーションの世界に入るという流れになる．
+    このように現在の没入環境ではシングルコンテキストな3D空間の間を，
+    非連続的に切り替えることしかできない．
   }
   \label{fig:switching-app}
 \end{figure}
+
+\footnotetext[3]{Adapted from Google. ``Google Earth VR'' \url{https://arvr.google.com/earth/} (accessed on 19 Dec, 2022)}
+\footnotetext[4]{Adapted from VRChat Inc. ``PRESS KIT - VRChat'' \url{https://hello.vrchat.com/press} (accessed on 19 Dec, 2022)}
 
 % ユーザの視野全体を占めている。
 % シングルコンテキスト
@@ -97,9 +105,9 @@ Horizon World\footnote{https://www.oculus.com/horizon-worlds/}といった
 \section{本研究の目的}
 
 本研究の目的はマルチコンテキストな没入環境の実現を目指し，
-その新しいパラダイムの可能性を詳細に検討することである．
+その新しいパラダイムの可能性と必要な基盤システムを詳細に検討することである．
 その検討が机上の空論とならないために，本研究では実際に動くシステムを実装しており，
-現状のエンジニアリング的な制約や，コンピューティングリソースの制約からくる限界にも目を向ける．
+現状のハードウェア的な制約や，コンピューティングリソースの制約からくる限界にも目を向ける．
 
 % マルチコンテキスト
 % より自由な市場の実現
@@ -107,5 +115,10 @@ Horizon World\footnote{https://www.oculus.com/horizon-worlds/}といった
 
 \section{本論文の構成}
 
-本論文では特に，マルチコンテキストな没入空間を実現するためのシステムデザインや，
-技術的な課題の解決に関しての研究成果をまとめている．
+本論文ではマルチコンテキストな没入環境を実現するため特に基礎となる，
+基盤システム全体の設計方針（第2章）・
+3Dアプリケーションのレンダリング手法（第3章）・
+既存の2Dアプリケーションの利用手法（第4章）
+それぞれについて既存技術や類似研究と比較しながら本システムで提案する手法を示し，
+その評価と今後の課題・まとめを述べる．
+最後に第5章でマルチコンテキストな没入環境を実現するという観点から全体をまとめる．

@@ -59,11 +59,11 @@
 \frontmatter
 
 \begin{jabstract}
-  日本語の要約．
+  \input src/abst-ja.tex
 \end{jabstract}
 
 \begin{eabstract}
-  English abstract.
+  \input src/abst-en.tex
 \end{eabstract}
 
 \tableofcontents
@@ -78,20 +78,22 @@
 
 \backmatter
 
-\pubUseLongName % 指定すると，タイトルが 「発表文献と研究活動」になる．
+% \pubUseLongName % 指定すると，タイトルが 「発表文献と研究活動」になる．
 \begin{publications}
-  \item Publications.
+  \item Akihiro Kiuchi, Taishi Eguchi, Jun Rekimoto, Manabu Tsukada, and Hiroshi Esaki.
+  Zigen: A windowing system enabling multitasking among 3d and 2d applications in immersive environments.
+  In ACM SIGGRAPH 2022 Posters, SIGGRAPH ’22, New York, NY, USA, 2022. Association for Computing Machinery.
 \end{publications}
 
 \bibliographystyle{junsrt}
 \bibliography{main}
 
 \begin{acknowledgements}
-  謝辞です．
+  \input src/acknowledgements.tex
 \end{acknowledgements}
 
-\appendix
+% \appendix
 
-If needed.
+% If needed.
 
 \end{document}

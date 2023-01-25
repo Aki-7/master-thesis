@@ -2,7 +2,9 @@
 
 3Dアプリケーションとコンポジッタとの間のプロトコルの中でも特に重要であるのが，
 アプリケーションの表示に関するレンダリングプロトコルである．
-レンダリングプロトコルに求められるものには以下のものがある．
+ここでも様々なアプリケーションを組み合わせて用いたときに，
+他のアプリケーションへの影響（競合）を最小限にしてレンダリングができるようにする必要がある．
+ここでレンダリングプロトコルに求められるものとして以下の指標を決めた．
 
 \begin{itemize}
   \item 複数のアプリケーションが別々に提示してきたレンダリングの情報を合成して，
@@ -43,7 +45,8 @@ Geometry Processingのフェーズ（図\ref{fig:geometry-processing}）
 ある視点から投影したときの座標（Clip Space）へ変換するフェーズである．
 Primitiveの頂点はまず，Model Matrixをかけることで，World Spaceのどこに配置するかが決定される．
 さらにこれに，視点の位置や向き，視野角などから取得されるView Projection Matrixを乗算することで，
-頂点はClip Spaceに配置される．
+頂点はClip Spaceに配置される．View Projection Matrixは視点の位置と向きを表す
+View Matrixと，視野角などから計算される投影の変換を表すProjection Matrixとの乗算で表される．
 
 これらの操作はVertex Shaderによって制御される．OpenGL
 \footnote{Khronos Group "OpenGL" https://www.opengl.org/ (accessed 27 Dec, 2022)}
@@ -87,24 +90,23 @@ Framebufferはピクセルごとの色の情報を保持するColor bufferと
 フラグメントはFramebufferのColor bufferとDepth bufferに格納される．
 RasterizationによってPrimitiveがフラグメントに変換され，そのフラグメントが次々と
 Framebufferに書きこまれていくが，このときDepth Testingを用いると，
-フラグメントの深度情報とFramebufferが持つ深度情報とを比較して，
+そのフラグメントの深度情報と書き込み先のFramebufferが持つ深度情報とを比較して，
 フラグメントが手前にあるときだけ，Framebufferに書き込むということができる．
-これによって，重なっているPrimitiveの処理順に関係なく，Primitiveの前後関係を
-レンダリングに反映させている．
+これによって，Primitiveの処理順に関係なく，重なっているPrimitiveの前後関係を
+レンダリングに反映させることができる．
 
 \subsection*{レンダリングパイプライン}
 
-今まで述べたプロセスはレンダリンパイプラインとして，GPU内で行われることが多い．
+今まで述べたプロセスはレンダリンパイプラインとして，GPUで行われる．
 ただしレンダリングパイプラインを実行するために必要なデータはプログラマによって
-CPUで作成され，OpenGLなどのAPIを通してGPUに送られるのが一般的である．
-レンダリングパイプラインへの入力としては主に以下のものがある．
+CPUとメインメモリで作成され，OpenGLなどのAPIを通してGPUに送られるのが一般的である．
+レンダリングパイプラインへの入力の例としては以下のものがある．
 
 \begin{itemize}
   \item メッシュに関するデータ：頂点の位置情報やそれに付随するデータなど．
   \item テクスチャ
-  \item Model Matrix の値
-  \item View Projection Matrix の値
-  \item Vertex / Fragment Shader
+  \item Model Matrix や View Matrix, Projection Matrix の値
+  \item Vertex / Fragment Shader（ソースコードの文字列などの形式）
 \end{itemize}
 
 \section{関連技術・研究}
@@ -117,8 +119,8 @@ MolnarらはParallel Renderingの手法を``sort-first'', ``sort-middle'', ``sor
 計算するタスクであり，Primitiveをスクリーンへとsort（選別・分配）するタスクであると捉えられる．
 Parallel Renderingにおいてこのsortのタスクでは，プロセッサ間でPrimitiveやフラグメントに
 関するデータを再配置する必要がある．
-Molnarらはこの再配置のタイミングに注目しており，``sort-first''は，Primitiveを
-Geometry Processingの際に再配置する手法，``sort-middle''はGeometry Processing後の
+Molnarらはこの再配置のタイミングに注目しており，``sort-first''はPrimitiveを
+Geometry Processingの際に再配置する手法，``sort-middle''はGeometry Processing後に
 Primitiveを再配置する手法，そして``sort-last''はRasterizationの際にフラグメントなどを
 再配置する手法である．
 
@@ -150,16 +152,17 @@ Primitiveを再配置する手法，そして``sort-last''はRasterizationの際
 データの分配のタイミングまでをアプリケーションが担い，分配後をコンポジッタが担うと捉えられる．
 ただしMolnarらの設定とは大きな違いがあり，Molnarらの論文ではスクリーンはいくつかの領域に
 分割され，その領域ごとにプロセッサが割り当てられてレンダリングを行う設定であったため，
-どのプロセッサにデータを再配置するかを知るために，データがスクリーンのどの領域に
+どのプロセッサにPrimitiveやフラグメントを再配置するかを知るために，それらがスクリーンのどの領域に
 影響を与えるものであるか計算できている必要があった．
 一方本研究の設定では，アプリケーションがデータを作成しコンポジッタで合成するために
 データの再配置（アプリケーションからコンポジッタへの描画情報の伝達）をおこなう．
-全く異なる設定ではあるが，Molnarらの論文での洞察や検証は本研究にも応用できる部分が多い．
+このため，Primitiveやフラグメントがどの領域にsortされるかといった計算は不要であるが，
+Molnarらの論文での洞察や検証は本研究にも応用できる部分が多い．
 
 Reilingの提案したmotorcar\cite{reiling}は
 ``sort-last''に近い手法（図\ref{fig:reiling-rendering}）をとっている．
-motorcarではそれぞれのアプリケーション（図\ref{fig:reiling-rendering}ではclient）が
-レンダリングを行い，生成したフレームバッファをできるだけ効率のよい方法でコンポジッタに送り，
+motorcarではそれぞれのアプリケーションがレンダリングパイプラインを実行し，
+生成したフレームバッファをできるだけ効率のよい方法でコンポジッタに送り，
 Depth Testingによってそれぞれのアプリケーションのフレームバッファどうしを合成している．
 motorcarの手法の特徴は以下のとおりである．
 
@@ -244,9 +247,11 @@ Peuhkurinenらの手法の特徴は以下のとおりである．
 
 \begin{enumerate}
   \item \textbf{Mesh}
-        位置を表す(X,Y,Z)と頂点の法線ベクトルの(X,Y,Z)，UVマッピングのための(U,V)の情報を持つ．
+        % textlint-disable
+        位置を表す(x,y,z)と頂点の法線ベクトルの(x,y,z)，UVマッピングのための(u,v)の情報を持つ．
+        % textlint-enable
   \item \textbf{Texture}
-        8bitずつのRGBAコンポーネントを持つ．
+        8bitずつのRGBAコンポーネントで構成される．
   \item \textbf{Transformation Matrix}
         アプリケーションのローカル座標系におけるMeshの平行移動，回転，スケールを表す4x4の変換行列．
   \item \textbf{Node}
@@ -273,7 +278,7 @@ Peuhkurinenらの手法の特徴は以下のとおりである．
 \section{提案手法}
 
 motorcarの手法では，レンダリングの自由度は高いが，レンダリングの効率や
-質の悪いアプリケーションがいた場合において問題があった．
+質の悪いアプリケーションが存在する場合において問題があった．
 一方共有シーングラフを用いたPeuhkurinenらの手法では，レンダリング効率や，
 質の悪いアプリケーションに関しては有効だが，レンダリングの自由度が制限されていた．
 本システムでは``sort-first''に近い手法を提案し，レンダリングの効率や質の悪いアプリケーションの問題を
@@ -287,7 +292,7 @@ motorcarの手法では，レンダリングの自由度は高いが，レンダ
 \footnote{Khronos Group "OpenGL ES Version 3.2" \url{https://registry.khronos.org/OpenGL/specs/es/3.2/es_spec_3.2.pdf} (accessed 29 Dec, 2022)}
 をもとにしている．
 
-OpenGLでは以下のようなオブジェクトが定義されており（一部）．
+OpenGLでは以下のようなオブジェクトが定義されており（一部），
 これらのオブジェクトといくつかのパラメータを指定してレンダリングパイプラインを実行することで，
 指定したFramebufferにレンダリング結果が格納される．
 \begin{itemize}
@@ -301,7 +306,7 @@ OpenGLでは以下のようなオブジェクトが定義されており（一�
         % \item \textbf{Framebuffer Objects} Framebufferとその状態を保持するオブジェクト
 \end{itemize}
 
-本システム（図 \ref{fig:rendering}）ではまず，アプリケーションがIPCを用いて上記の6つの
+本レンダリングシステム（図 \ref{fig:rendering}）ではまず，アプリケーションがIPCを用いて上記の6つの
 オブジェクト（Rendering Resource）をコンポジッタ側で作成するプロトコルを用意した．
 また，レンダリングパイプライン実行時に指定するオブジェクトとパラメータをまとめた
 Rendering Unitというオブジェクトを新たに定義した．Rendering Unitは
@@ -325,15 +330,15 @@ Rendering Resourceは複数のRendering Unitに対して紐づけることが可
 テクスチャの形式，そしてシェーダを自由に設定，記述でき，
 レンダリングの自由度を高く保つことができた．
 また，レンダリングパイプラインの実行自体は全てコンポジッタ側で行われるため，
-GPUのコンテキストスイッチが少なく，効率的である．
-TextureやBuffer，Shaderなどのサイズの大きいオブジェクトはその生成やフォーマットの修正，
-転送のコストも無視できないが，本システムではアプリケーションは共有メモリを介してそれらの
+GPUのコンテキストスイッチが少なく効率的である．
+一般にTextureやBuffer，Shaderなどのサイズの大きいオブジェクトはその生成やフォーマットの修正，
+転送のコストも無視できないが，本レンダリングシステムではアプリケーションは共有メモリを介してそれらの
 オブジェクトをコンポジッタと共有し，コンポジッタはそのデータを再形成することなくそのまま
 GPU上のメモリに転送できるため，転送や再形成のためにオーバヘッドがかかることはない．
 最後に，質の悪いアプリケーションに対応するための工夫を述べる．
 
 \ref{section:overview:windowing-system}で述べたとおり，
-マルチコンテキストな没入環境を実現するためには，アプリケーション間の衝突を防ぎ，
+マルチコンテキストな没入環境を実現するためには，アプリケーション間の競合を防ぎ，
 適切に分離することが大切である．
 そのため質の悪いアプリケーションがフリーズしたり，動作が遅くなった場合でも，
 そのアプリケーションをレンダリングする際の視点情報が更新される必要がある．
@@ -347,20 +352,20 @@ GPU上のメモリに転送できるため，転送や再形成のためにオ�
 他のアプリケーションは通常通り利用できる．
 
 また，本システムではアプリケーションの位置をコンポジッタ側が決定する．
-これはユーザがアプリケーションを好きな位置に配置し，アプリケーションどうしの空間的な衝突を
+これはユーザがアプリケーションを好きな位置に配置し，アプリケーションどうしの空間的な競合を
 ユーザが最小限にできることを保証するためであるが，フリーズしたり，動作が遅いアプリケーションでも
 その配置を変更できるようにする必要がある．
 そのため質の悪いアプリケーションがフリーズしたり，動作が遅くなった場合でも，アプリケーションの
 配置を決めるModel Matrixが更新可能である必要がある．
 
 以上の議論から，レンダリングする際にModel Matrixと視点の情報である
-View Projection Matrixをいかに適用するかが重要である．
-\ref{section:3DCG}で述べたように，通常Model MatrixやView Projection Matrix は
+View Matrix，Projection Matrixをいかに適用するかが重要である．
+\ref{section:3DCG}で述べたように，通常Model MatrixやView Matrix， Projection Matrix は
 Uniform変数として用い，シェーダで頂点に対して適用することが多い．
 一般的な既存のVRアプリケーション（図\ref{fig:app-mvp}）では
 ソースコード\ref{code:vertex-shader}のようなVertex Shaderと，そのVertex Shaderで
 用いられているModel MatrixやView Projection Matrixを示すUniform変数に入れる値を
-Graphics Pipelineに伝えることで，頂点にModel MatrixとView Projection matrix
+Graphics Pipelineに伝えることで，頂点にModel MatrixとView Projection Matrix
 を適用させている．
 
 \begin{figure}[htbp]
@@ -372,11 +377,12 @@ Graphics Pipelineに伝えることで，頂点にModel MatrixとView Projection
   \label{fig:app-mvp}
 \end{figure}
 
-本システムのレンダリングシステムでは（図\ref{fig:rendering}），Model Matrixは
-コンポジッタがアプリケーションごとに管理しているものを，View Projection Matrixは
+本レンダリングシステムでは（図\ref{fig:rendering}），Model Matrixは
+コンポジッタがアプリケーションごとに管理しているものを，View Matrix，Projection Matrixは
 HMDから取得したものをアプリケーションへ渡すことなくGraphics Pipeline実行時に適用する．
 そのため本システムではシェーダで用いるUniform変数のいくつかを予約しており，
-例えば``zModel''という名前のUniform変数にはModel Matrixの値を，
+例えば``zModel''という名前のUniform変数にはModel Matrixの値を，``zView''という名前の
+Uniform変数にはView Matrixの値を，
 ``zViewProjection''というUniform変数にはView Projection Matrixの値をコンポジッタ側で
 設定することとしている．
 アプリケーションはソースコード\ref{code:zigen-vertex-shader}のようなVertex Shaderを
@@ -393,7 +399,7 @@ HMDから取得したものをアプリケーションへ渡すことなくGraph
   }
 \end{lstlisting}
 
-このように本システムでは，Model MatrixとView Projection Matrixを表すUniform変数の値を
+このように本システムでは，Model Matrix，View Matrix，　Projection Matrixを表すUniform変数の値を
 コンポジッタ側が，それ以外のレンダリングパイプラインの実行に必要なオブジェクトやパラメータを
 アプリケーション側が提供し，コンポジッタ側でレンダリングパイプラインを実行する．
 これにより，レンダリングに関するオーバヘッドが小さく，レンダリングの自由度を高く保ち，
@@ -413,8 +419,12 @@ HMDから取得したものをアプリケーションへ渡すことなくGraph
 
 プログラミング言語はCとC++を用いた．
 アプリケーションとコンポジッタ間のIPCにはWaylandを用いた．
-HMDへの出力，HMDからのView Projection Matrixの取得にはSteamVRランタイムのOpenVRを用いた．
+HMDへの出力，HMDからのView Matrix，Projection Matrixの取得には
+SteamVR\footnote{Valve Corporation ``SteamVR'' \url{https://store.steampowered.com/steamvr} (accessed on 24 Jan, 2023)}
+ランタイムのOpenVR\footnote{Valve Corporation ``OpenVR'' \url{https://partner.steamgames.com/doc/features/steamvr/openvr} (accessed on 24 Jan, 2023)}
+を用いた．
 その他の環境に関しては表\ref{table:rendering-env}に示す．
+また，今回の実装ではFPSの上限は90fpsとなっている．
 
 \begin{table}[htbp]
   \centering
@@ -436,8 +446,6 @@ HMDへの出力，HMDからのView Projection Matrixの取得にはSteamVRラン
   \caption{レンダリングに関する実験環境}
   \label{table:rendering-env}
 \end{table}
-
-また，今回の実装ではFPSの上限は90fpsとなっている．
 
 \subsection{実験の設定}
 
@@ -515,7 +523,7 @@ STL AppとSTL App with rotationにおいて，アプリケーション数が90�
 この章では様々なレンダリング手法が本レンダリングシステムで適応できることを示し，
 レンダリングの自由度が高いことを示す．
 
-\subsection{フラグメントシェーダでのRay Marchingを用いたメタボール}
+\subsection{Fragment ShaderでのRay Marchingを用いたメタボール}
 
 Ray Marchingはメッシュを用いずにRayを走査することでレンダリングを行う技法の1つであり，
 数学的な幾何構造の可視化\cite{ray-marching-math}に用いられたり，
@@ -525,7 +533,7 @@ Ray Marchingはメッシュを用いずにRayを走査することでレンダ�
 メタボール\cite{meta-ball}とはメタボールどうしが近づくことで，
 一定の規則に沿ってそれらのメタボールが融合し，ひとかたまりとなる球状のオブジェクトである．
 
-ここではフラグメントシェーダ内でのRay Marchingの一種である
+ここではFragment Shader内でのRay Marchingの一種である
 Sphere Tracing\cite{sphere-tracing}を実装し，本システムで
 メタボールを表現可能であることを確認した（図\ref{fig:meta-ball}）．
 
@@ -600,6 +608,11 @@ OpenGLではその他にもGeometry ShaderやTesselation Shaderなどがあり�
   \label{fig:bumpmap}
 \end{figure}
 
+以上の3つのレンダリング手法はレンダリングパイプラインの機能を用いた様々なレンダリング手法の
+ごく一部であり，これらをシーングラフを定義する方法では定義しきれない．
+本レンダリングシステムは，シーングラフという抽象化を行うのではなく，
+レンダリングパイプラインへの入力をそのままアプリケーションが制御できるようにしたことで，
+レンダリングの自由度が飛躍的に向上したことを確かめることができた．
 
 % Sphere Tracing はRay Marching手法の1つで，
 
