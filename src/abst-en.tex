@@ -1,1 +1,44 @@
-English abstract.
+% textlint-disable
+In the modern desktop environment, windowing systems allow
+multiple applications to be used in a single screen space.
+The context of a user, i.e., what the user is trying to do and for
+what purpose, is diverse and unspecific, changing from user to user and
+from time to time.
+However, users can construct screen spaces that suit their various contexts
+by installing applications and using them in arbitrary combinations.
+
+In the current immersive environment, on the other hand,
+basically one application dominates the user's entire field of view.
+Therefore, the 3D space in an immersive environment is a single-context space
+that is designed for a specific context, such as a meeting or an event,
+by a single application.
+The purpose of this research is to realize a multi-context immersive environment
+that can support everyday work and life where the context continuously changes,
+and to investigate in detail the basic infrastructure software necessary
+for this new paradigm.
+In the course of this research, I have simultaneously developed "Zwin",
+a windowing system for XR that can actually be used, and have been spreading it
+as an OSS project.
+This paper reports the results of basic research to realize "Zwin,"
+including the overall design, the rendering protocol,
+and the use of existing 2D applications in an immersive environment.
+For the overall design, I summarized the advantages and disadvantages of
+similar studies and concluded the design of the system required for
+the multi-context immersive environment.
+For rendering, I proposed a rendering system with high rendering flexibility
+and performance, and robustness against poor quality applications,
+and showed that it is sufficient for practical use.
+As for the use of existing 2D applications, I showed that cooperation
+between 3D applications and existing 2D applications, such as drag-and-drop,
+is possible by designing the interaction protocols of 3D applications
+to be convertible to those of 2D windowing systems.
+
+In the multi-context immersive environment that lies ahead of this research,
+applications from various vendors can be launched simultaneously to create
+one immersive environment, and each application only needs to provide
+specific functions, not the entire space.
+Therefore, the diversity of applications and their developers
+is expected to increase.
+I hope that this research will lead immersive environments to become
+a more open and inclusive market.
+% textlint-enable
